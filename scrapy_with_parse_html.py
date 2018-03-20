@@ -1,5 +1,6 @@
 import urllib.parse
 import urllib.request
+from bs4 import BeautifulSoup
 
 # request params:
 # CategoryId=808
@@ -18,6 +19,7 @@ def getHtml(url, values):
 
     return html
 
+
 def sendHttpRequest(index):
     print('http request')
     url = 'http://www.cnblogs.com/mvc/AggSite/PostList.aspx'
@@ -34,11 +36,26 @@ def sendHttpRequest(index):
     return result
 
 
-def writeFile(data):
-    html_file = open('blog.html', 'w')
-    html_file.write(data)
-    html_file.close()
+def htmlParser(html_data):
+    soup = BeautifulSoup(html_data, 'html.parser')
+    all_div = soup.find_all('div', attrs={'class': 'post_item_body'}, limit=20)
+
+    for item in all_div:
+        analyzeBlog(item)
+
+
+def analyzeBlog(item):
+    result = {}
+    a_title = find_all(item, 'a', 'titlelnk')
+    print(a_title)
+
+# item = <class 'bs4.element.Tag'>
+def find_all(item, attr, c):
+    return item.find_all(attr, attrs={'class':c}, limit = 1)
+
 
 if __name__ == "__main__":
     html_data = sendHttpRequest(1)
-    writeFile(html_data)
+    # print(html_data)
+    htmlParser(html_data)
+
