@@ -44,18 +44,36 @@ def htmlParser(html_data):
         analyzeBlog(item)
 
 
-def analyzeBlog(item):
-    result = {}
-    a_title = find_all(item, 'a', 'titlelnk')
-    print(a_title)
-
 # item = <class 'bs4.element.Tag'>
 def find_all(item, attr, c):
-    return item.find_all(attr, attrs={'class':c}, limit = 1)
+    return item.find_all(attr, attrs={'class': c}, limit=1)
+
+
+# get blog article title and link
+def getBlogTitleAndLink(item, result):
+    a_title = find_all(item, 'a', 'titlelnk')
+
+    if a_title is not None:
+        result["title"] = a_title[0].string
+        result["href"] = a_title[0]["href"]
+
+
+# get blog article summary
+def getBlogSummary(item, result):
+    p_summary = find_all(item, 'p', 'post_item_summary')
+
+    if p_summary is not None:
+        result["summary"] = p_summary[0].text
+
+
+def analyzeBlog(item):
+    result = {}
+    getBlogTitleAndLink(item, result)
+    getBlogSummary(item, result)
+    print(result)
 
 
 if __name__ == "__main__":
     html_data = sendHttpRequest(1)
     # print(html_data)
     htmlParser(html_data)
-
