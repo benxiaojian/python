@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>827</width>
+    <height>622</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
    <widget class="QPushButton" name="open_file">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>20</x>
       <y>0</y>
       <width>80</width>
       <height>23</height>
@@ -40,7 +40,7 @@
      <string>open</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="eight_lines">
+   <widget class="QPushButton" name="print_lines">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -50,10 +50,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>print line</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="eight_lines">
     <property name="geometry">
      <rect>
       <x>290</x>
@@ -63,7 +63,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>eight_lines</string>
     </property>
    </widget>
   </widget>
@@ -72,7 +72,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>827</width>
      <height>20</height>
     </rect>
    </property>
