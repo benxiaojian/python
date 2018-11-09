@@ -15,6 +15,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         super(Ui_MainWindow, self).__init__()
         self.setupUi(MainWindow)
         self.retranslateUi(MainWindow)
+        self.Rectangle_list = [0, 0, 0, 0]
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -46,6 +47,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.open_file.clicked.connect(self.openFile)
+        self.print_lines.clicked.connect(self.printBox)
 
 
     def retranslateUi(self, MainWindow):
@@ -64,6 +66,30 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         pix = QtGui.QPixmap(img_name).scaled(self.label.width(), self.label.height())
         self.label.setPixmap(pix)
+
+
+    def printBox(self):
+        painter = QtGui.QPainter(self)
+        painter.drawRect(self.Rectangle_list[0], self.Rectangle_list[1], self.Rectangle_list[2], self.Rectangle_list[3])
+
+
+    def mousePressEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            print("鼠标点击")
+        self.Rectangle_list[0] = e.x()
+        self.Rectangle_list[1] = e.y()
+
+        if e.button() == Qt.RightButton:
+            self.Point_list.clear()
+            self.Rectangle_list = [0, 0, 0, 0]
+            self.update()
+
+
+    def mouseMoveEvent(self, e):
+        print("鼠标移动")
+        self.Rectangle_list[2] = e.x() - self.Rectangle_list[0]
+        self.Rectangle_list[3] = e.y() - self.Rectangle_list[1]
+        self.update()
 
 
 if __name__ == '__main__':
