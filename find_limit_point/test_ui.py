@@ -6,6 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 import sys
+import copy
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt, QPoint
@@ -37,6 +38,8 @@ class BtnLabel(QLabel):
         self.painter = QtGui.QPainter(self)
         self.paint_event = 0
         self.pos = None
+        self.degree = 0
+        self.action = None
 
     def getRectList(self):
         return self.rect_list
@@ -74,18 +77,42 @@ class BtnLabel(QLabel):
         self.painter.begin(self)
         self.painter.setPen(QtGui.QPen(Qt.red, 2, Qt.SolidLine))
 
-        if self.pos is not None:
+        if self.action == "point":
             self.painter.setBrush(Qt.red)
-            self.painter.drawEllipse(self.pos.x(), self.pos.y(), 20, 20)
-            self.pos = None
-        else:
+            self.painter.drawEllipse(self.pos.x - 10, self.pos.y - 10, 20, 20)
+        elif self.action == "rect":
             for sharp in self.rect_list:
                 sharp.paint(self.painter)
                 # print(sharp.rect)
+        elif self.action == "lines":
+            self.painter.setBrush(Qt.red)
+            self.painter.drawEllipse(self.pos.x - 10, self.pos.y - 10, 20, 20)
+            self.painter.translate(self.pos.x, self.pos.y)
+            self.painter.setPen(QtGui.QPen(Qt.black, 2, Qt.SolidLine))
+            self.painter.drawLine(QPoint(0, -400), QPoint(0, 400))
+            self.painter.setPen(QtGui.QPen(Qt.red, 2, Qt.SolidLine))
+            for i in range(0, 8):
+                if i == 0:
+                    self.painter.rotate(self.degree)
+                else:
+                    self.painter.rotate(i * 45)
+                self.painter.drawLine(QPoint(0, 0), QPoint(0, 400))
+
         self.painter.end()
 
     def paintPoint(self, pos):
         self.pos = pos
+        self.action = "point"
+        self.update()
+
+    def paintLines(self, degree):
+        self.action = "lines"
+        self.degree = degree
+        self.update()
+
+    def painRect(self):
+        self.action = "rect"
+        self.update()
 
 class Eight:
     def __init__(self):
@@ -93,19 +120,30 @@ class Eight:
         self.mid_acreage = 0
 
     def calcMidPoint(self, rect_list):
+        self.mid_point = None
+        self.mid_acreage = 0
         mid = QPoint()
         for rect in rect_list:
             mid.x = (rect.start.x() + rect.end.x()) / 2
             mid.y = (rect.start.y() + rect.end.y()) / 2
-            acreage = abs(rect.start.x() - rect.end.x()) * (rect.start.y() - rect.end.y())
+            acreage = abs(rect.start.x() - rect.end.x()) * abs(rect.start.y() - rect.end.y())
+            print(mid.x, mid.y, acreage)
 
             if self.mid_point is None:
-                self.mid_point = mid
+                self.mid_point = QPoint()
+                self.mid_point.x = mid.x
+                self.mid_point.y = mid.y
+                # self.mid_point = copy.deepcopy(mid)
                 self.mid_acreage = acreage
             else:
-                rate = self.acreage / (self.mid_acreage + acreage)
-                x = (mid.x() - self.mid_point.x()) * rate + self.mid_point.x()
-                y = (mid.y() - self.mid_point.y()) * rate + self.mid_point.y()
+                rate = acreage / (self.mid_acreage + acreage)
+                print(rate)
+                print("---", self.mid_point.x, self.mid_point.y)
+                print(rate * (mid.x - self.mid_point.x))
+                print(rate * (mid.y - self.mid_point.y))
+                x = rate * (mid.x - self.mid_point.x) + self.mid_point.x
+                y = rate * (mid.y - self.mid_point.y) + self.mid_point.y
+                print(x, y)
                 self.mid_point.x = x
                 self.mid_point.y = y
                 self.mid_acreage += acreage
@@ -156,6 +194,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.open_file.clicked.connect(self.openFile)
         self.print_lines.clicked.connect(self.findMidPoint)
+        self.eight_lines.clicked.connect(self.patinEightLines)
 
 
     def retranslateUi(self, MainWindow):
@@ -176,6 +215,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         pix = QtGui.QPixmap(img_name).scaled(self.label.width(), self.label.height())
         self.label.setPixmap(pix)
         self.label.setCursor(Qt.CrossCursor)
+        self.label.painRect()
 
     def findMidPoint(self):
         eight = Eight()
@@ -183,6 +223,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         print(pox.x, pox.y)
         self.label.paintPoint(pox)
 
+    def patinEightLines(self):
+        self.label.paintLines(23)
 
 
 if __name__ == '__main__':
