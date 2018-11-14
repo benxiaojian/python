@@ -41,6 +41,16 @@ class BtnLabel(QLabel):
         self.degree = 0
         self.action = None
 
+    def clearPaint(self):
+        self.if_mouse_press = False
+        self.rect_list = []
+        self.sharp = None
+        self.painter = QtGui.QPainter(self)
+        self.paint_event = 0
+        self.pos = None
+        self.degree = 0
+        self.action = None
+
     def getRectList(self):
         return self.rect_list
 
@@ -49,12 +59,8 @@ class BtnLabel(QLabel):
             if self.sharp is not None:
                 self.sharp.setEnd(e.pos())
                 self.update()
-            # self.rect_point[2] = e.pos().x()
-            # self.rect_point[3] = e.pos().y()
-            # self.update()
 
     def mousePressEvent(self, e):
-        # print('mousePressEvent(%d,%d)\n' % (e.pos().x(), e.pos().y()))
         self.if_mouse_press = True
         self.sharp = Rect()
         if self.sharp is not None:
@@ -62,12 +68,8 @@ class BtnLabel(QLabel):
             self.sharp.setStart(e.pos())
             self.sharp.setEnd(e.pos())
         self.update()
-        # self.rect_point[0] = e.pos().x()
-        # self.rect_point[1] = e.pos().y()
-        # ui.move_point(e.pos().x(), e.pos().y())
 
     def mouseReleaseEvent(self, e):
-        # print('mouseReleaseEvent(%d,%d)\n' % (e.pos().x(), e.pos().y()))
         self.if_mouse_press = False
         self.sharp = None
         self.update()
@@ -111,6 +113,12 @@ class BtnLabel(QLabel):
         self.update()
 
     def painRect(self):
+        self.clearPaint()
+        self.action = "rect"
+        self.update()
+
+    def paintClean(self):
+        self.clearPaint()
         self.action = "rect"
         self.update()
 
@@ -180,6 +188,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.eight_lines.setGeometry(QtCore.QRect(290, 0, 80, 23))
         self.eight_lines.setObjectName("eight_lines")
 
+        self.clean = QtWidgets.QPushButton(self.centralwidget)
+        self.clean.setGeometry(QtCore.QRect(430, 0, 80, 23))
+        self.clean.setObjectName("clean")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 827, 20))
@@ -195,22 +207,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.open_file.clicked.connect(self.openFile)
         self.print_lines.clicked.connect(self.findMidPoint)
         self.eight_lines.clicked.connect(self.patinEightLines)
+        self.clean.clicked.connect(self.patinClean)
 
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.label.setText(_translate("MainWindow", "TextLabel"))
-        self.open_file.setText(_translate("MainWindow", "open"))
-        self.print_lines.setText(_translate("MainWindow", "print line"))
-        self.eight_lines.setText(_translate("MainWindow", "eight_lines"))
+        self.label.setText(_translate("MainWindow", "等待图片加载"))
+        self.open_file.setText(_translate("MainWindow", "打开"))
+        self.print_lines.setText(_translate("MainWindow", "定极点"))
+        self.eight_lines.setText(_translate("MainWindow", "画八宫线"))
+        self.clean.setText(_translate("MainWindow", "清空"))
 
     def openFile(self):
-        # img_name, img_type = QFileDialog.getOpenFileName(self, "打开图片", "", " *.jpg,*.png;;*.jpeg;;*.bmp;;All Files (*)")
-        # if img_name == "":
-        #     return
-
-        img_name = 'timg.jpeg'
+        img_name, img_type = QFileDialog.getOpenFileName(self, "打开图片", "", "All Files (*);;*.jpg;;*.png;;*.jpeg;;*.bmp")
+        if img_name == "":
+            return
 
         pix = QtGui.QPixmap(img_name).scaled(self.label.width(), self.label.height())
         self.label.setPixmap(pix)
@@ -224,7 +236,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label.paintPoint(pox)
 
     def patinEightLines(self):
-        self.label.paintLines(23)
+        value, ok = QInputDialog.getDouble(self, "八宫线偏转角度", "输入加上天地人元龙角度后的偏转度数:", 22.5, -10000, 10000, 2)
+        print(value)
+        self.label.paintLines(value)
+
+    def patinClean(self):
+        self.label.paintClean()
+        self.update()
 
 
 if __name__ == '__main__':
